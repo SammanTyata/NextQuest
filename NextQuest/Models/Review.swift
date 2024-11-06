@@ -15,7 +15,7 @@ struct Review: Identifiable,Codable{
     var title = ""
     var body = ""
     var rating = 0
-    var reviewer = ""
+    var reviewer = Auth.auth().currentUser?.email ?? ""
     var postedON: Date = Date()
     
     var dictionary: [String: Any] {
@@ -23,7 +23,7 @@ struct Review: Identifiable,Codable{
             "title": title,
             "body": body,
             "rating": rating,
-            "reviewer": Auth.auth().currentUser?.email ?? "",
+            "reviewer": reviewer,
             "postedON": Timestamp(date: Date())
         ]
     }

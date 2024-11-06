@@ -27,13 +27,20 @@ struct SpotDetailView: View {
     @State private var showPlaceLookupSheet = false
     @State private var showReviewViewSheet = false
     @State private var showingAsSheet = false
-    
     @State private var showSaveAlert = false
-    
     @State private var mapRegion = MKCoordinateRegion()
     @State private var cameraPosition =  MKCoordinateRegion.self
     
     @State private var annotations: [Annotation] = []
+    var avgRating: String {
+        guard reviews.count != 0 else
+        {
+            return "-.-"
+        }
+        let averageValue = Double(reviews.reduce(0) { $0 + $1.rating }) / Double(reviews.count)
+        return String(format: "%.1f", averageValue)
+    }
+    
     @Environment(\.dismiss) private var dismiss
     let regionSize = 500.0 //meters
     var previewRunning = false
@@ -57,7 +64,12 @@ struct SpotDetailView: View {
             .padding(.horizontal)
             
             Map(coordinateRegion: $mapRegion, showsUserLocation: true, annotationItems: annotations) { annotation in
-                MapMarker(coordinate: annotation.coordinate)
+                MapAnnotation(coordinate: annotation.coordinate){
+                    Image(systemName: "mappin.circle.fill")
+                        .foregroundColor(.red)
+                        .font(.title)
+                }
+                //MapMarker(coordinate: annotation.coordinate)
             }
             .frame(height:250)
             .onChange(of: spot) {
@@ -71,7 +83,7 @@ struct SpotDetailView: View {
                         NavigationLink {
                             ReviewView(spot: spot, review: review)
                         } label: {
-                            Text(review.title)
+                            SpotReviewRowView(review: review)
                         }
 
                     }
@@ -80,7 +92,7 @@ struct SpotDetailView: View {
                         Text("Average Rating:")
                             .font(.title2)
                             .bold()
-                        Text("4.5") // Need to change to a computed value later
+                        Text(avgRating) // Need to change to a computed value later
                             .font(.title)
                             .fontWeight(.black)
                             .foregroundColor(Color("NextQuestColor"))
@@ -101,18 +113,6 @@ struct SpotDetailView: View {
                 .headerProminence(.increased)
             }
             .listStyle(.plain)
-
-            
-//            Map{
-//                // Add your map content here
-//                ForEach(annotations) { annotation in
-//                    Marker(annotation.name, coordinate: annotation.coordinate)
-//                }
-//            }.onChange(of: spot) {
-//                annotations = [Annotation(name: spot.name, address: spot.address, coordinate: spot.coordinate)]
-//                mapRegion.center = spot.coordinate
-//            }
-            
             Spacer()
         }
         .onAppear(){
@@ -146,7 +146,6 @@ struct SpotDetailView: View {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button("Save") {
                             //add Save code Here
-                            
                             Task{
                                 let success = await spotVM.saveSpot(spot: spot)
                                 if success{
@@ -186,6 +185,7 @@ struct SpotDetailView: View {
                 ReviewView(spot: spot, review: Review())
             }
         }
+
         .alert("Cannot rate unless Saved", isPresented: $showSaveAlert) {
             Button("Cancle", role: .cancel){}
             Button("Save", role: .none){
