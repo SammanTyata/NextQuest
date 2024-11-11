@@ -15,6 +15,10 @@ class LocationManager: NSObject, ObservableObject{
     
     private let locationManager =  CLLocationManager()
     
+    var currentLocation: CLLocation? {
+            return location
+        }
+    
     override init() {
         super.init()
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
