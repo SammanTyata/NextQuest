@@ -1,4 +1,6 @@
 # NextQuest
+Version: 2.0 - Nov 10 2024
+Team Members: Samman Tyata
 
 NextQuest is a SwiftUI application designed to connect users with lesser-known attractions cherished by locals. The app aims to provide personalized recommendations based on location, offering an authentic travel experience.
 
@@ -15,12 +17,25 @@ Screens have been designed with minimal yet functional buttons to demonstrate na
 
 ## Project Timeline Overview
 1.	Initial Planning & Setup -- Completed
-2.	Core Feature Development -- Ongoing
-3.	Integration, Testing, and Refinement -- Not Started
+2.	Core Feature Development -- Completed
+3.	Integration, Testing, and Refinement -- Ongoing
 4.	Final Testing, Deployment, and Launch Preparation -- Not Started
 
+## Progress Update
+1. All the features needed for the MVP are operational.
+2. User can sort the locations based on the proximity ot alphabetical order. 
+3. Average ratings are now accurately reflected. 
+4. Reviews made by a different user can't be edited or deleted. However, if the review is editable by the user who added it. 
+5. State management to store the data and views appropriately.
+6. Firebase Authentication and data storage is fully operational.
+
 ## Future Development
-Future versions will focus on refining the user experience, enhancing the data model, and implementing additional features. It will also include Integration, Testing, and the deployment of the app.
+Future versions will focus on adding photots option for the review. refining the user experience, and implementing additional features. It will also include Integration, Testing, and the deployment of the app.
+
+1. Option to add the photos for the review/location.
+2. Verify user email when sign up.
+3. Testing the app for bugs.
+4. Final Testing, Deployment
 
 ## List of features needed for the MVP + Breakdown of tasks
 
