@@ -4,28 +4,40 @@
 //
 //  Created by Samman Tyata on 10/24/24.
 //
-
 import SwiftUI
 import Firebase
 import FirebaseAuth
 import FirebaseFirestore
 import CoreLocation
 
-
 struct ListView: View {
     @FirestoreQuery(collectionPath: "spots") var spots: [Spot]
-    @State private var sortedSpots: [Spot] = []
+    @State private var sortedSpots: [Spot] = [] // This will be the array to display the sorted spots
     @State private var sheetIsPresented: Bool = false
     @State private var spotRatings: [String: Double] = [:] // Dictionary to store average ratings for spots
+    @State private var favoriteSpots: Set<String> = [] // Set of favorite spot IDs
+    @State private var selectedSpot: Spot? // Store selected spot for favoriting
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var locationManager: LocationManager // Accessing LocationManager as an environment object
+    
+    @State private var currentUser: User? = Auth.auth().currentUser // Store current user
+    @State private var showFavoritesOnly: Bool = false // Flag to show favorites only
 
+    // Load favorite spots from Firebase on user login
+    init() {
+        _currentUser = State(initialValue: Auth.auth().currentUser)
+    }
+    
     var body: some View {
         NavigationStack {
             VStack {
+                // List of spots (either all spots or only favorite spots)
                 List(sortedSpots) { spot in
                     NavigationLink {
                         SpotDetailView(spot: spot)
+                            .onAppear {
+                                self.selectedSpot = spot
+                            }
                     } label: {
                         VStack(alignment: .leading) {
                             Text(spot.name)
@@ -46,6 +58,15 @@ struct ListView: View {
                             }
                         }
                     }
+                    .contextMenu {
+                        // Context Menu to add to favorites
+                        Button(action: {
+                            toggleFavorite(spot)
+                        }) {
+                            Label("Favorite", systemImage: favoriteSpots.contains(spot.id ?? "") ? "heart.fill" : "heart")
+                                .foregroundColor(favoriteSpots.contains(spot.id ?? "") ? .red : .gray)
+                        }
+                    }
                 }
                 .listStyle(.plain)
                 .navigationTitle("New Quests")
@@ -53,19 +74,19 @@ struct ListView: View {
 
                 // Sorting Buttons
                 HStack {
-                    Button("Sort Alphabetically") {
-                        sortedSpots = spots.sorted { $0.name < $1.name }
+                    Button("A-Z") {
+                        sortSpotsByName()
                     }
                     .buttonStyle(.bordered)
                     .padding()
 
-                    Button("Sort by Proximity") {
+                    Button("Proximity") {
                         sortSpotsByProximity()
                     }
                     .buttonStyle(.bordered)
                     .padding()
 
-                    Button("Sort by Rating") {
+                    Button("Rating") {
                         sortSpotsByRating()
                     }
                     .buttonStyle(.bordered)
@@ -86,10 +107,21 @@ struct ListView: View {
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        sheetIsPresented.toggle()
-                    } label: {
-                        Image(systemName: "plus")
+                    HStack {
+                        Button(action: {
+                            showFavoritesOnly.toggle() // Toggle between showing all spots or favorites only
+                            sortSpots() // Reapply sorting after toggling favorites
+                        }) {
+                            Image(systemName: showFavoritesOnly ? "heart.fill" : "heart") // Filled heart if showing favorites
+                                .foregroundColor(.red)
+                        }
+                        .padding(.trailing, 10)
+
+                        Button {
+                            sheetIsPresented.toggle()
+                        } label: {
+                            Image(systemName: "plus")
+                        }
                     }
                 }
             }
@@ -102,37 +134,102 @@ struct ListView: View {
                 }
             }
             .onAppear {
-                sortSpotsByProximity()
+                if let userId = currentUser?.uid {
+                    loadFavorites(userId: userId) // Fetch favorites when the view appears
+                }
+                sortSpotsByProximity() // Default sorting by proximity
                 fetchRatingsForAllSpots() // Update ratings when the view appears
             }
-            .onChange(of: spots) { _ in
-                sortSpotsByProximity()
+            .onChange(of: spots) {
+                sortSpotsByProximity() // Sort whenever the list of spots changes
                 fetchRatingsForAllSpots() // Update ratings when spots change
+            }
+            .onChange(of: favoriteSpots) {
+                sortSpots() // Re-sort whenever favorites change
             }
         }
     }
 
-    private func sortSpotsByProximity() {
-        guard let userLocation = locationManager.currentLocation else {
-            print("User location not available")
-            return
+    // Filtered spots that are either all spots or just favorites
+    private var filteredSpots: [Spot] {
+        if showFavoritesOnly {
+            return spots.filter { favoriteSpots.contains($0.id ?? "") }
+        } else {
+            return spots
         }
+    }
 
-        sortedSpots = spots.sorted {
-            let location1 = CLLocation(latitude: $0.latitude, longitude: $0.longitude)
-            let location2 = CLLocation(latitude: $1.latitude, longitude: $1.longitude)
-            return location1.distance(from: userLocation) < location2.distance(from: userLocation)
+    // Sort the spots based on the selected sorting criteria
+    private func sortSpots() {
+        if let userLocation = locationManager.currentLocation {
+            sortedSpots = filteredSpots.sorted {
+                let location1 = CLLocation(latitude: $0.latitude, longitude: $0.longitude)
+                let location2 = CLLocation(latitude: $1.latitude, longitude: $1.longitude)
+                return location1.distance(from: userLocation) < location2.distance(from: userLocation)
+            }
         }
         print("Sorted by Proximity:", sortedSpots.map { $0.name })
     }
 
+    // Sort by A-Z (alphabetical order)
+    private func sortSpotsByName() {
+        sortedSpots = filteredSpots.sorted { $0.name < $1.name }
+        print("Sorted by A-Z:", sortedSpots.map { $0.name })
+    }
+
+    // Sort by Proximity
+    private func sortSpotsByProximity() {
+        sortSpots() // Sort by proximity after filtering
+    }
+
+    // Sort by Rating
     private func sortSpotsByRating() {
-        sortedSpots = spots.sorted { spot1, spot2 in
+        sortedSpots = filteredSpots.sorted { spot1, spot2 in
             let rating1 = spotRatings[spot1.id ?? ""] ?? 0
             let rating2 = spotRatings[spot2.id ?? ""] ?? 0
             return rating1 > rating2 // Sort descending by rating
         }
         print("Sorted by Rating:", sortedSpots.map { $0.name })
+    }
+
+    private func loadFavorites(userId: String) {
+        let db = Firestore.firestore()
+        db.collection("users").document(userId).getDocument { document, error in
+            if let document = document, document.exists {
+                if let favorites = document.data()?["favoriteSpots"] as? [String] {
+                    self.favoriteSpots = Set(favorites)
+                }
+            } else {
+                print("Error loading favorites: \(error?.localizedDescription ?? "Unknown error")")
+            }
+        }
+    }
+
+    private func saveFavorites(userId: String) {
+        let db = Firestore.firestore()
+        db.collection("users").document(userId).setData([
+            "favoriteSpots": Array(favoriteSpots)
+        ], merge: true) { error in
+            if let error = error {
+                print("Error saving favorites: \(error.localizedDescription)")
+            } else {
+                print("Favorites saved successfully!")
+            }
+        }
+    }
+
+    private func toggleFavorite(_ spot: Spot) {
+        guard let spotId = spot.id else { return }
+        
+        if favoriteSpots.contains(spotId) {
+            favoriteSpots.remove(spotId) // Unmark as favorite
+        } else {
+            favoriteSpots.insert(spotId) // Mark as favorite
+        }
+
+        if let userId = currentUser?.uid {
+            saveFavorites(userId: userId) // Save updated favorites to Firestore
+        }
     }
 
     private func calculateDistance(to spot: Spot) -> Double? {
@@ -182,14 +279,10 @@ struct ListView: View {
 }
 
 
-
 #Preview {
     NavigationStack {
         ListView()
             .environmentObject(LocationManager()) // Inject LocationManager as an environment object
     }
 }
-
-
-
 
