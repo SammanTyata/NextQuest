@@ -8,12 +8,6 @@
 import SwiftUI
 
 struct SpotDetailPhotosScrollView: View {
-//    struct FakePhoto: Identifiable {
-//        let id = UUID().uuidString
-//        var imageURLString = "https://firebasestorage.googleapis.com:443/v0/b/snacktacularui.appspot.com/o/9BZzOrPTQhwoR2V8i09Y%2F675C6C26-38FD-4B0C-9587-C4A0911DFD74.jpeg?alt=media&token=2030b59e-52bb-4f3f-81eb-7f5424d71575"
-//    }
-//
-//    let photos = [FakePhoto(), FakePhoto(), FakePhoto(), FakePhoto(), FakePhoto(), FakePhoto(), FakePhoto(), FakePhoto()]
     
     @State private var showPhotoViewerView = false
     @State private var uiImage = UIImage()
@@ -58,6 +52,6 @@ struct SpotDetailPhotosScrollView: View {
 
 struct SpotDetailPhotosScrollView_Previews: PreviewProvider {
     static var previews: some View {
-        SpotDetailPhotosScrollView(photos: [Photo(imageURLString: "https://firebasestorage.googleapis.com:443/v0/b/snacktacularui.appspot.com/o/9BZzOrPTQhwoR2V8i09Y%2FB59BDF50-A3A9-441E-BDD9-DBB77017F5D6.jpeg?alt=media&token=b2cda875-b509-4fa9-9889-57ba81412561")], spot: Spot(id: "9BZzOrPTQhwoR2V8i09Y"))
+        SpotDetailPhotosScrollView(photos: [Photo(imageURLString: "")], spot: Spot(id: ""))
     }
 }
