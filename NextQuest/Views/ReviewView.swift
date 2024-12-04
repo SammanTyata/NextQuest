@@ -1,4 +1,3 @@
-//
 //  ReviewView.swift
 //  NextQuest
 //
@@ -27,13 +26,14 @@ struct ReviewView: View {
                         .font(.title2)
                         .fontWeight(.semibold)
                         .lineLimit(1)
+                        .foregroundColor(.primary)  // Dynamic color for title text
+
                     Text(spot.address)
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.secondary)  // Dynamic color for address
                         .lineLimit(2)
                 }
                 .padding(.leading, 0)
-
                 
                 Divider()
                     .padding(.horizontal, 20)
@@ -42,7 +42,7 @@ struct ReviewView: View {
                 Text(rateOrReviewerString)
                     .font(postedByThisUser ? .title3 : .body)
                     .fontWeight(.medium)
-                    .foregroundColor(postedByThisUser ? .primary : .secondary)
+                    .foregroundColor(postedByThisUser ? .primary : .secondary)  // Dynamic text color
                     .padding(.horizontal)
                 
                 HStack {
@@ -57,8 +57,6 @@ struct ReviewView: View {
                         )
                         .padding(.bottom, 10)
                 }
-
-
                 
                 Divider()
                     .padding(.horizontal, 20)
@@ -72,7 +70,7 @@ struct ReviewView: View {
                     
                     TextField("Enter review title", text: $review.title)
                         .padding(14)
-                        .background(Color.white)
+                        .background(Color(UIColor.systemBackground)) // Dynamic background
                         .cornerRadius(10)
                         .shadow(radius: 4, x: 0, y: 2)
                         .overlay(
@@ -80,6 +78,7 @@ struct ReviewView: View {
                                 .stroke(postedByThisUser ? Color.blue : Color.gray.opacity(0.5), lineWidth: 1)
                         )
                         .padding(.horizontal)
+                        .foregroundColor(.primary) // Text color adapts to light/dark mode
                 }
                 
                 Divider()
@@ -97,7 +96,7 @@ struct ReviewView: View {
                     
                     TextEditor(text: $review.body)
                         .padding(14)
-                        .background(Color.white)
+                        .background(Color(UIColor.systemBackground)) // Dynamic background
                         .cornerRadius(10)
                         .frame(minHeight: 150)
                         .shadow(radius: 4, x: 0, y: 2)
@@ -107,6 +106,7 @@ struct ReviewView: View {
                         )
                         .disabled(!postedByThisUser)
                         .padding(.horizontal)
+                        .foregroundColor(.primary) // Text color adapts to light/dark mode
                 }
                 
                 Spacer()
@@ -129,7 +129,7 @@ struct ReviewView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(action: { dismiss() }) {
                         Text("Cancel")
-                            .foregroundColor(.red)
+                            .foregroundColor(.red)  // Dynamic red for cancel
                             .fontWeight(.medium)
                     }
                 }
@@ -137,7 +137,7 @@ struct ReviewView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: saveReview) {
                         Text("Save")
-                            .foregroundColor(.blue)
+                            .foregroundColor(.blue)  // Dynamic blue for save
                             .fontWeight(.medium)
                     }
                 }
@@ -147,7 +147,7 @@ struct ReviewView: View {
                         Spacer()
                         Button(action: deleteReview) {
                             Image(systemName: "trash")
-                                .foregroundColor(.red)
+                                .foregroundColor(.red)  // Dynamic red for delete
                                 .font(.title2)
                         }
                         .padding(.horizontal)

@@ -9,6 +9,17 @@ import FirebaseAuth
 import FirebaseFirestore
 import CoreLocation
 
+//  ListView.swift
+//  NextQuest
+//
+//  Created by Samman Tyata on 10/24/24.
+//
+import SwiftUI
+import Firebase
+import FirebaseAuth
+import FirebaseFirestore
+import CoreLocation
+
 struct ListView: View {
     @FirestoreQuery(collectionPath: "spots") var spots: [Spot]
     @State private var sortedSpots: [Spot] = []
@@ -42,7 +53,7 @@ struct ListView: View {
                                 Text(spot.name)
                                     .font(.title3)
                                     .fontWeight(.semibold)
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(.primary)  // Dynamic text color for dark/light mode
                                     .lineLimit(1)
                                     .truncationMode(.tail)
 
@@ -82,7 +93,7 @@ struct ListView: View {
                         .padding(.vertical, 4)
                         .padding(.leading, 2)  // Half the usual left padding (16 -> 8)
                         .padding(.trailing)    // Keep full padding on the right
-                        .background(Color.white)
+                        .background(Color(.systemBackground))  // Dynamically adjust background color for both modes
                         .cornerRadius(4)
                         .listRowInsets(EdgeInsets()) // Removes default row padding
                     }
@@ -94,6 +105,7 @@ struct ListView: View {
                                 .foregroundColor(favoriteSpots.contains(spot.id ?? "") ? .red : .gray)
                         }
                     }
+                    .listRowBackground(Color(.systemBackground))  // Dynamically adjust background for list rows
                 }
                 .listStyle(.plain)
                 .navigationTitle("New Quests")
@@ -292,9 +304,6 @@ struct ListView: View {
             }
     }
 }
-
-
-
 
 #Preview {
     NavigationStack {
