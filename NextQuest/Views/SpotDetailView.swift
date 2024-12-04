@@ -4,7 +4,6 @@
 //
 //  Created by Samman Tyata on 10/24/24.
 //
-
 import SwiftUI
 import MapKit
 import FirebaseFirestore
@@ -47,6 +46,8 @@ struct SpotDetailView: View {
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var uiImageSelected = UIImage()
     
+    private let spotTypes: [Spot.SpotType] = [.outdoor, .food] // Spot types as Spot.SpotType enum
+    
     var avgRating: String {
         guard reviews.count != 0 else {
             return "-.-"
@@ -63,12 +64,45 @@ struct SpotDetailView: View {
         VStack {
             Group {
                 TextField("Name", text: $spot.name)
-                    .font(.body)  // Smaller font
-                    .padding(.vertical, 8) // Optional: adjust vertical padding for better spacing
-                
+                    .font(.body)
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 16)
+                    .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3), lineWidth: 1))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .strokeBorder(Color.blue.opacity(0.5), lineWidth: 1)
+                            .opacity(0)
+                    )
+
                 TextField("Address", text: $spot.address)
-                    .font(.subheadline) // Smaller font
-                    .padding(.vertical, 8) // Optional: adjust vertical padding
+                    .font(.subheadline)
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 16)
+                    .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3), lineWidth: 1))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .strokeBorder(Color.blue.opacity(0.5), lineWidth: 1)
+                            .opacity(0)
+                    )
+
+                Picker("Type", selection: $spot.type) {
+                    ForEach(spotTypes, id: \.self) { type in
+                        Text(type.rawValue)
+                            .font(.footnote)
+                            .padding(.vertical, 6)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(maxWidth: .infinity, alignment: .leading)  // Ensures the Picker stretches and aligns to the left
+                .padding([.leading, .trailing], 16)
+                .frame(height: 44)
+                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3), lineWidth: 1))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .strokeBorder(Color.blue.opacity(0.5), lineWidth: 1)
+                        .opacity(0)
+                )
             }
             .disabled(spot.id == nil ? false : true)
             .padding(.horizontal)
@@ -89,10 +123,10 @@ struct SpotDetailView: View {
             HStack {
                 Group {
                     Text("Average Rating:")
-                        .font(.subheadline) // Smaller font size
+                        .font(.subheadline)
                         .bold()
                     Text(avgRating)
-                        .font(.title3) // Smaller font size
+                        .font(.title3)
                         .fontWeight(.black)
                         .foregroundColor(Color("NextQuestColor"))
                 }
@@ -168,10 +202,10 @@ struct SpotDetailView: View {
             if spot.id != nil {
                 Button(action: openInMaps) {
                     Label("Open in Maps", systemImage: "map")
-                        .font(.subheadline)  // Smaller font size
+                        .font(.subheadline)
                         .foregroundColor(.white)
-                        .padding(.vertical, 8) // Optional: reduce vertical padding
-                        .padding(.horizontal, 16) // Optional: reduce horizontal padding
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 16)
                         .background(Color.blue)
                         .cornerRadius(8)
                 }
@@ -204,7 +238,7 @@ struct SpotDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(spot.id == nil)
         .toolbar {
-            if showingAsSheet { // New Spot so show Cancel and Save buttons
+            if showingAsSheet {
                 if spot.id == nil && showingAsSheet {
                     ToolbarItem(placement: .cancellationAction) {
                         Button("Cancel") {
@@ -222,9 +256,8 @@ struct SpotDetailView: View {
                                 }
                             }
                         }
-                        .disabled(spot.name.isEmpty || spot.address.isEmpty) // Disable if name or address is empty
+                        .disabled(spot.name.isEmpty || spot.address.isEmpty)
                     }
-                    // Search Place button at the bottom
                     ToolbarItemGroup(placement: .bottomBar) {
                         Spacer()
                         Button {
@@ -233,7 +266,6 @@ struct SpotDetailView: View {
                             Image(systemName: "magnifyingglass")
                             Text("Search Place")
                         }
-                        .frame(maxWidth: .infinity, alignment: .center) // Center the button
                     }
                 } else if showingAsSheet && spot.id != nil {
                     ToolbarItem(placement: .navigationBarTrailing) {
@@ -296,7 +328,6 @@ struct SpotDetailView: View {
     }
 }
 
-
 #Preview {
     NavigationStack {
         SpotDetailView(spot: Spot(), previewRunning: true)
@@ -304,3 +335,4 @@ struct SpotDetailView: View {
             .environmentObject(LocationManager())
     }
 }
+
