@@ -14,7 +14,7 @@ struct StarsSelectionView: View {
     let higherRating = 5
     let unselected = Image(systemName: "star")
     let selected = Image(systemName: "star.fill")
-    var font: Font = .largeTitle
+    var font: Font = .title // Adjusted font size to make stars smaller
     let fillColor: Color = .red
     let emptyColor: Color = .gray
     
@@ -22,9 +22,9 @@ struct StarsSelectionView: View {
         HStack{
             ForEach(1...higherRating, id: \.self) { number in
                 showStar(for: number)
-                    .foregroundColor(number <= rating ? fillColor: emptyColor)
+                    .foregroundColor(number <= rating ? fillColor : emptyColor)
                     .onTapGesture {
-                        if interactive{
+                        if interactive {
                             rating = number
                         }
                     }
@@ -33,16 +33,14 @@ struct StarsSelectionView: View {
         }
     }
     
-    func showStar( for number: Int) -> Image{
+    func showStar(for number: Int) -> Image {
         if number > rating {
             return unselected
-        } else{
+        } else {
             return selected
         }
     }
-    
 }
-
 
 #Preview {
     StarsSelectionView(rating:.constant(4))

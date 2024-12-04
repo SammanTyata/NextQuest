@@ -45,7 +45,6 @@ struct SpotDetailView: View {
     
     @State private var annotations: [Annotation] = []
     @State private var selectedPhoto: PhotosPickerItem?
-    //@State private var selectedImage = Image(systemName: "photo")
     @State private var uiImageSelected = UIImage()
     
     var avgRating: String {
@@ -64,17 +63,14 @@ struct SpotDetailView: View {
         VStack {
             Group {
                 TextField("Name", text: $spot.name)
-                    .font(.title)
+                    .font(.body)  // Smaller font
+                    .padding(.vertical, 8) // Optional: adjust vertical padding for better spacing
                 
                 TextField("Address", text: $spot.address)
-                    .font(.title2)
+                    .font(.subheadline) // Smaller font
+                    .padding(.vertical, 8) // Optional: adjust vertical padding
             }
             .disabled(spot.id == nil ? false : true)
-            .textFieldStyle(.roundedBorder)
-            .overlay {
-                RoundedRectangle(cornerRadius: 5)
-                    .stroke(.gray.opacity(0.5), lineWidth: spot.id == nil ? 2 : 0)
-            }
             .padding(.horizontal)
             
             Map(coordinateRegion: $mapRegion, showsUserLocation: true, annotationItems: annotations) { annotation in
@@ -90,15 +86,13 @@ struct SpotDetailView: View {
                 mapRegion.center = spot.coordinate
             }
             
-            SpotDetailPhotosScrollView(photos: photos, spot: spot)
-            
             HStack {
-                Group{
+                Group {
                     Text("Average Rating:")
-                        .font(.title2)
+                        .font(.subheadline) // Smaller font size
                         .bold()
                     Text(avgRating)
-                        .font(.title)
+                        .font(.title3) // Smaller font size
                         .fontWeight(.black)
                         .foregroundColor(Color("NextQuestColor"))
                 }
@@ -153,6 +147,8 @@ struct SpotDetailView: View {
             }
             .padding(.horizontal)
             
+            SpotDetailPhotosScrollView(photos: photos, spot: spot)
+            
             List {
                 Section {
                     ForEach(reviews) { review in
@@ -168,15 +164,19 @@ struct SpotDetailView: View {
             .listStyle(.plain)
             Spacer()
             
-            Button(action: openInMaps) {
-                Label("Open in Maps", systemImage: "map")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .cornerRadius(8)
+            // "Open in Maps" button only if spot is saved (spot.id != nil)
+            if spot.id != nil {
+                Button(action: openInMaps) {
+                    Label("Open in Maps", systemImage: "map")
+                        .font(.subheadline)  // Smaller font size
+                        .foregroundColor(.white)
+                        .padding(.vertical, 8) // Optional: reduce vertical padding
+                        .padding(.horizontal, 16) // Optional: reduce horizontal padding
+                        .background(Color.blue)
+                        .cornerRadius(8)
+                }
+                .padding(.bottom)
             }
-            .padding()
         }
         .onAppear {
             Task {
@@ -221,9 +221,10 @@ struct SpotDetailView: View {
                                     print("Error saving spot")
                                 }
                             }
-                            dismiss()
                         }
+                        .disabled(spot.name.isEmpty || spot.address.isEmpty) // Disable if name or address is empty
                     }
+                    // Search Place button at the bottom
                     ToolbarItemGroup(placement: .bottomBar) {
                         Spacer()
                         Button {
@@ -232,6 +233,7 @@ struct SpotDetailView: View {
                             Image(systemName: "magnifyingglass")
                             Text("Search Place")
                         }
+                        .frame(maxWidth: .infinity, alignment: .center) // Center the button
                     }
                 } else if showingAsSheet && spot.id != nil {
                     ToolbarItem(placement: .navigationBarTrailing) {
@@ -271,7 +273,6 @@ struct SpotDetailView: View {
                         case .photo:
                             showPhotoViewSheet.toggle()
                         }
-                       
                     } else {
                         print("Error saving Spot")
                     }
@@ -294,6 +295,7 @@ struct SpotDetailView: View {
         }
     }
 }
+
 
 #Preview {
     NavigationStack {
