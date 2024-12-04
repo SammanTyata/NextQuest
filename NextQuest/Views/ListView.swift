@@ -37,13 +37,26 @@ struct ListView: View {
                             }
                     } label: {
                         VStack(alignment: .leading, spacing: 10) {
-                            // Spot Name with subtle styling
-                            Text(spot.name)
-                                .font(.title3)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.primary)
-                                .lineLimit(1)
-                                .truncationMode(.tail)
+                            HStack {
+                                // Spot Name with subtle styling
+                                Text(spot.name)
+                                    .font(.title3)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.primary)
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
+
+                                Spacer()  // Push the icon to the right
+
+                                // Icon for Spot Type (Outdoor/Food)
+                                if spot.type == .outdoor {
+                                    Image(systemName: "mountain.2.fill")  // Outdoor icon
+                                        .foregroundColor(.green)
+                                } else if spot.type == .food {
+                                    Image(systemName: "fork.knife")  // Food icon
+                                        .foregroundColor(.orange)
+                                }
+                            }
 
                             // Proximity and Rating in a smaller font
                             HStack {
@@ -116,11 +129,8 @@ struct ListView: View {
                         .frame(width: 120)  // Adjusted width to fit bigger text
                         .padding(.vertical)
                     }
-                    .padding(.top,4)
+                    .padding(.top, 4)
                 }
-
-
-
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -282,6 +292,7 @@ struct ListView: View {
             }
     }
 }
+
 
 
 
