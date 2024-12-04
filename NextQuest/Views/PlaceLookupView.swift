@@ -20,33 +20,42 @@ struct PlaceLookupView: View {
     //var places = ["Here", "There", "Everywhere"]
     var body: some View {
         NavigationStack {
-            List(placeVM.places) { place in
-                VStack(alignment: .leading) {
-                    Text(place.name)
+            VStack {
+                List(placeVM.places) { place in
+                    VStack(alignment: .leading) {
+                        Text(place.name)
+                            .font(.title2)
+                        Text(place.address)
+                            .font(.callout)
+                    }
+                    .onTapGesture {
+                        spot.name = place.name
+                        spot.address = place.address
+                        spot.latitude = place.latitude
+                        spot.longitude = place.longitude
+                        dismiss()
+                    }
+                }
+                .listStyle(.plain)
+                .searchable(text: $searchText)
+                .onChange(of: searchText) {
+                    if !searchText.isEmpty {
+                        placeVM.search(text: searchText, region: locationManager.region)
+                    } else {
+                        placeVM.places = []
+                    }
+                }
+            }
+            .toolbar {
+                // Title and Dismiss button in the same toolbar line
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Text("Search Place")
                         .font(.title2)
-                    Text(place.address)
-                        .font(.callout)
+                        .fontWeight(.bold)
                 }
-                .onTapGesture {
-                    spot.name = place.name
-                    spot.address = place.address
-                    spot.latitude = place.latitude
-                    spot.longitude = place.longitude
-                    dismiss()
-                }
-            }
-            .listStyle(.plain)
-            .searchable(text: $searchText)
-            .onChange(of: searchText) {
-                if !searchText.isEmpty {
-                    placeVM.search(text: searchText, region: locationManager.region)
-                } else {
-                    placeVM.places = []
-                }
-            }
-            .toolbar{
-                ToolbarItem(placement: .automatic) {
-                    Button("Dismiss"){
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Dismiss") {
                         dismiss()
                     }
                 }
