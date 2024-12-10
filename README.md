@@ -1,5 +1,5 @@
 # NextQuest
-Version: 2.0 - Nov 10 2024
+Version: 3.0 - Dec 10 2024
 Team Members: Samman Tyata
 
 NextQuest is a SwiftUI application designed to connect users with lesser-known attractions cherished by locals. The app aims to provide personalized recommendations based on location, offering an authentic travel experience.
@@ -18,8 +18,8 @@ Screens have been designed with minimal yet functional buttons to demonstrate na
 ## Project Timeline Overview
 1.	Initial Planning & Setup -- Completed
 2.	Core Feature Development -- Completed
-3.	Integration, Testing, and Refinement -- Ongoing
-4.	Final Testing, Deployment, and Launch Preparation -- Not Started
+3.	Integration, Testing, and Refinement -- Completed
+4.	Final Testing, Deployment, and Launch Preparation -- Completed
 
 ## Progress Update
 1. All the features needed for the MVP are operational.
@@ -28,14 +28,8 @@ Screens have been designed with minimal yet functional buttons to demonstrate na
 4. Reviews made by a different user can't be edited or deleted. However, if the review is editable by the user who added it. 
 5. State management to store the data and views appropriately.
 6. Firebase Authentication and data storage is fully operational.
-
-## Future Development
-Future versions will focus on adding photots option for the review. refining the user experience, and implementing additional features. It will also include Integration, Testing, and the deployment of the app.
-
-1. Option to add the photos for the review/location.
-2. Verify user email when sign up.
-3. Testing the app for bugs.
-4. Final Testing, Deployment
+7. Add photos for the spot.
+8. Added spot type and updated the list with icon to view the type - outdoor/food. 
 
 ## List of features needed for the MVP + Breakdown of tasks
 
@@ -64,3 +58,8 @@ the app dynamic and unique.
 details for each attraction in a single view.
 4. Rating and Review System -> Adds credibility and helps users assess attractions based
 on peer reviews.
+
+## Challenges Unique to Mobile Devices:
+1. GPS sensor is used to get the device's real-time location.
+2. External Storage Dependencies - Firebase to store the list of locations with real-time updates of all devices + Firebase for secure authentication with verification.
+3. Launching external applications. - Open Apple maps for directions.
